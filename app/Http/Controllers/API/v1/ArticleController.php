@@ -143,4 +143,23 @@ class ArticleController extends Controller
         }
 
     }
+
+    public function destroy($id)
+    {
+        $article = Article::find($id);
+        try {
+            $article->delete();
+            return response()->json([
+                'status' => Response::HTTP_OK,
+                'message' => 'Data succces to delete'
+            ], Response::HTTP_OK);
+        } catch (Exception $e) {
+            Log::error('Error storing data : ' . $e->getMessage());
+
+            return response()->json([
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => 'Failed deleted data to db'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

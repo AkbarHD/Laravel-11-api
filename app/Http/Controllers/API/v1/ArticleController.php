@@ -12,13 +12,21 @@ use Illuminate\Support\Facades\Validator;
 
 class ArticleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         /**
          * fetch data dari table artikel berdasarkan data
          * cari data yang terbaru
          */
-        $articles = Article::latest()->get();
+
+        //  search
+        $query = Article::query()->latest('publish_date');
+        $keyword = $request->input('title');
+        if ($keyword) {
+            $query->where('title', 'like', '%' . $keyword . '%');
+            $articles = $query->paginate(2);
+        }
+        $articles = $query->paginate(4);
 
         /** jika data kosong tampilkan hasil dan pesan di bawah */
         if ($articles->isEmpty()) {
@@ -36,6 +44,7 @@ class ArticleController extends Controller
                         'publish_date' => $article->publish_date
                     ];
                 }),
+                // 'data' => $articles,
                 'message' => 'List Article',
                 'status' => Response::HTTP_OK,
             ], Response::HTTP_OK);
